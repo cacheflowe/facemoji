@@ -1,0 +1,26 @@
+{
+  "name": "facemoji",
+  "version": "1.0.0",
+  "description": "emojis on your face",
+  "main": "gruntfile.js",
+  "dependencies": {
+    "grunt": "^0.4.5"
+  },
+  "devDependencies": {
+    "grunt-chmod": "^1.0.3",
+    "grunt-contrib-concat": "^0.5.1",
+    "grunt-contrib-copy": "^0.8.0",
+    "grunt-contrib-cssmin": "^0.12.2",
+    "grunt-contrib-uglify": "^0.8.0",
+    "grunt-regex-replace": "^0.2.6"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "none"
+  },
+  "author": "",
+  "license": "ISC"
+}

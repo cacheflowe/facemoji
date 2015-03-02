@@ -1,0 +1,162 @@
+html, body {
+  margin: 0px;
+  padding: 0px;
+  height: 100%;
+  background-color: #111;
+  -webkit-user-select: none;
+  user-select: none;
+  overflow: hidden;
+}
+html {
+  font-size: 62.5%;
+}
+body {
+  font-size: 1.5em; /* currently ems cause chrome bug misinterpreting rems on body element */
+  line-height: 1.6;
+  font-weight: normal;
+  font-family: "Railway", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: #eee;
+
+  background: -moz-radial-gradient(center, ellipse cover,  #000000 0%, #567fa0 100%); /* FF3.6+ */
+  background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,#000000), color-stop(100%,#567fa0)); /* Chrome,Safari4+ */
+  background: -webkit-radial-gradient(center, ellipse cover,  #000000 0%,#567fa0 100%); /* Chrome10+,Safari5.1+ */
+  background: -o-radial-gradient(center, ellipse cover,  #000000 0%,#567fa0 100%); /* Opera 12+ */
+  background: -ms-radial-gradient(center, ellipse cover,  #000000 0%,#567fa0 100%); /* IE10+ */
+  background: radial-gradient(ellipse at center,  #000000 0%,#567fa0 100%); /* W3C */
+}
+
+h1 {
+  font-size: 4em;
+  margin: 20px 0 -20px;
+  font-weight: normal;
+}
+#webcam-canvas,
+#webcam-video,
+#renderer {
+  display: none;
+}
+.facemoji {
+  width: 100%;
+  width: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+
+  -webkit-transition: opacity 0.6s linear;
+  -moz-transition: opacity 0.6s linear;
+  -o-transition: opacity 0.6s linear;
+  transition: opacity 0.6s linear;
+  opacity: 0;
+}
+.tracking .facemoji {
+  opacity: 1;
+}
+
+.started #start {
+  display: none;
+}
+#camera,
+#denied {
+  display: none;
+}
+.started #camera {
+  display: inline;
+}
+
+.denied #camera,
+.denied #start {
+  display: none;
+}
+.denied #denied {
+  display: inline;
+}
+
+
+.container {
+  position: absolute;
+  max-width: 400px;
+  text-align: center;
+  left: 50%;
+  top: 50%;
+  -webkit-transform: translate3d(-50%,-50%,0);
+  -moz-transform: translate3d(-50%,-50%,0);
+  -o-transform: translate3d(-50%,-50%,0);
+  transform: translate3d(-50%,-50%,0);
+
+  -webkit-transition: opacity 0.6s linear;
+  -moz-transition: opacity 0.6s linear;
+  -o-transition: opacity 0.6s linear;
+  transition: opacity 0.6s linear;
+  opacity: 1;
+}
+.tracking .container {
+  opacity: 0;
+}
+
+.controls {
+  position: absolute;
+  bottom: 0;
+  text-align: center;
+  width: 100%;
+  z-index: 10;
+}
+button {
+  padding: 4px;
+  background-color: transparent;
+  border: 0;
+  outline: 0;
+  position: relative;
+  cursor: pointer;
+}
+
+
+
+button span {
+  position: absolute;
+  left: 50%;
+  top: -40px;
+  font-size: 18px;
+  color: #eee;
+  background: rgba(0,0,0,0.5);
+  border-radius: 5px;
+  transform: translate3d(-50%,0,0);
+  padding: 5px 13px;
+  pointer-events: none;
+
+  -webkit-transition: opacity 0.2s linear;
+  -moz-transition: opacity 0.2s linear;
+  -o-transition: opacity 0.2s linear;
+  transition: opacity 0.2s linear;
+  opacity: 0;
+}
+button:hover span {
+  opacity: 1;
+}
+
+button img {
+  width: 70px;
+  height: 70px;
+}
+
+.credit-link {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  padding: 18px;
+  width: 40px;
+  height: 40px;
+  z-index: 20;
+
+  -webkit-transition: opacity 0.2s linear;
+  -moz-transition: opacity 0.2s linear;
+  -o-transition: opacity 0.2s linear;
+  transition: opacity 0.2s linear;
+  opacity: 0.5;
+}
+.credit-link.right {
+  left: auto;
+  right: 0;
+}
+.credit-link:hover {
+  opacity: 1;
+}
