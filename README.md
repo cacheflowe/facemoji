@@ -1,6 +1,7 @@
 # TODO:
 
 * Upgrade to PIXI v2-3
+* Add new multi-skintone emojis
 
 
 # Commands
