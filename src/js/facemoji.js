@@ -10,9 +10,11 @@ Facemoji = (function() {
     this.handleKeys = __bind(this.handleKeys, this);
     this.camW = 320;
     this.camH = 240;
+    this.active = true;
     this.faceTracker = new FacetrackerWrapper(this.buildCanvas, this.noWebcamFallback);
     document.addEventListener('keyup', this.handleKeys);
     this.buildButtons();
+    this.buildSaveModal();
   }
 
   Facemoji.prototype.buildCanvas = function() {
@@ -75,12 +77,15 @@ Facemoji = (function() {
 
   Facemoji.prototype.handleKeys = function(e) {
     // console.log(e.keyCode);
-    if(e.keyCode == 37) this.prevEmoji();
-    if(e.keyCode == 39) this.nextEmoji();
-    if(e.keyCode == 70) this.toggleFilters();
-    if(e.keyCode == 32) this.faceTracker.recalibrate();
-    if(e.keyCode == 83) this.saveScreenshot();
-    if(e.keyCode == 82) this.startRecording();
+    if(this.active == true) {
+      if(e.keyCode == 37) this.prevEmoji();
+      if(e.keyCode == 39) this.nextEmoji();
+      if(e.keyCode == 70) this.toggleFilters();
+      if(e.keyCode == 32) this.faceTracker.recalibrate();
+      if(e.keyCode == 83) this.saveScreenshot();
+      if(e.keyCode == 82) this.startRecording();
+    };
+    if(e.keyCode == 27) this.closeModal();
   };
 
   Facemoji.prototype.buildButtons = function() {
@@ -91,6 +96,14 @@ Facemoji = (function() {
     document.getElementById('recalibrate').addEventListener('click', function() { self.faceTracker.recalibrate(); });
     document.getElementById('save').addEventListener('click', function() { self.saveScreenshot(); });
     document.getElementById('record').addEventListener('click', function() { self.startRecording(); });
+    document.getElementById('close').addEventListener('click', function() { self.closeModal(); });
+  };
+
+  Facemoji.prototype.buildSaveModal = function() {
+    this.saveImg = document.getElementById('save-img');
+    this.saveImgLink = document.getElementById('save-img-link');
+    this.saveModal = document.getElementById('save-modal');
+    this.downloadImgLink = document.getElementById('download');
   };
 
   Facemoji.prototype.prevEmoji = function() {
@@ -117,19 +130,21 @@ Facemoji = (function() {
 
   Facemoji.prototype.animate = function() {
     window.requestAnimFrame(this.animate);
-    this.tvFilter.time = Date.now() / 100;
-    this.getOffsetAndSizeToCrop(window.innerWidth, window.innerHeight, this.camW, this.camH);
-    this.updateWebCamTexture();
-    var event = this.faceTracker.trackingEvent;
-    if (event) {
-      if (!this.faceEmoji) {
-        this.createFaces();
+    if(this.active == true) {
+      this.tvFilter.time = Date.now() / 100;
+      this.getOffsetAndSizeToCrop(window.innerWidth, window.innerHeight, this.camW, this.camH);
+      this.updateWebCamTexture();
+      var event = this.faceTracker.trackingEvent;
+      if (event) {
+        if (!this.faceEmoji) {
+          this.createFaces();
+        }
+        this.updateFacePosition(event);
       }
-      this.updateFacePosition(event);
+      this.animatefaceEmoji();
+      this.renderer.render(this.pixiStage);
+      this.recordFrame();
     }
-    this.animatefaceEmoji();
-    this.renderer.render(this.pixiStage);
-    this.recordFrame();
   };
 
   Facemoji.prototype.updateWebCamTexture = function() {
@@ -178,15 +193,38 @@ Facemoji = (function() {
   };
 
   Facemoji.prototype.saveScreenshot = function() {
-    var base64img, win;
     this.renderer.render(this.pixiStage);
-    base64img = this.renderer.view.toDataURL();
+    var base64img = this.renderer.view.toDataURL();
+    this.setImageInModal(base64img, 'png');
+  };
+
+  Facemoji.prototype.saveScreenshotToNewWindow = function(base64img) {
     win = window.open();
     win.document.write("<img src='" + base64img + "'/>");
   };
 
+  Facemoji.prototype.setImageInModal = function(base64img, type) {
+    this.saveImg.setAttribute('src', base64img);
+    this.saveImgLink.setAttribute('href', base64img);
+    this.downloadImgLink.setAttribute('href', base64img);
+    this.saveImgLink.setAttribute('download', 'facemoji.'+type);
+    this.downloadImgLink.setAttribute('download', 'facemoji.'+type);
+    this.saveModal.classList.add('showing');
+    this.active = false;
+  };
+
+  Facemoji.prototype.closeModal = function() {
+    var self = this;
+    this.saveModal.classList.remove('showing');
+    setTimeout(function() {
+      self.saveImg.setAttribute('src', '');
+    }, 1000);
+    this.active = true;
+  };
+
   Facemoji.prototype.startRecording = function() {
     if(this.renderingGif == true) return;
+
     // grab renderer buffer canvas
     this.rendererCanvas = document.getElementById('renderer');
     this.rendererCanvas.width = Math.round(this.renderer.width / 3);
@@ -201,20 +239,27 @@ Facemoji = (function() {
     });
     var self = this;
     this.gif.on('finished', function(blob) {
-      self.openNewWindow(URL.createObjectURL(blob));
+      self.setImageInModal(URL.createObjectURL(blob), 'gif');
+      self.renderProgress.classList.remove('active');
+      self.renderProgress.style.width = '0%';
     });
 
     this.gifFrames = 0;
+    this.recordFrames = 40;
     this.renderingGif = true;
     this.rendered = false;
+    this.renderProgress = document.getElementById('record-progress');
+    this.renderProgress.classList.add('active');
   };
 
   Facemoji.prototype.recordFrame = function() {
+    var self = this;
     if(this.renderingGif == true) {
-      if(this.gifFrames <= 30) {
+      if(this.gifFrames <= this.recordFrames) {
         this.rendererCtx.drawImage(this.renderer.view, 0, 0, this.rendererCanvas.width, this.rendererCanvas.height); // draw from pixi canvas to renderer buffer canvas
         this.gif.addFrame(this.rendererCanvas, {copy: true, delay: 16});
-      } else if(this.gifFrames == 35 && this.rendered == false) {
+        this.renderProgress.style.width = Math.round(100 * (this.gifFrames / this.recordFrames)) + '%';
+      } else if(this.gifFrames == this.recordFrames + 5 && this.rendered == false) {
         this.gif.render();
         this.rendered = true;
         this.renderingGif = false;

@@ -31,6 +31,7 @@ module.exports = function(grunt) {
           'dist/js/app.min.js': [
                               'src/js/lib/pixi.js',
                               'src/js/lib/headtrackr.min.js',
+                              'src/js/lib/prefixfree.min.js',
                               'src/js/gif/gif.js',
                               'src/js/shaders/tv-filter.js',
                               'src/js/shaders/vignette-filter.js',

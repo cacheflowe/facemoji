@@ -1,6 +1,5 @@
 # TODO:
 
-* Make gif pop into a modal
 * Upgrade to PIXI v2-3
 
 
